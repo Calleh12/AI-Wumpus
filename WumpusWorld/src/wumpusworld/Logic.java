@@ -47,4 +47,9 @@ public class Logic
 	    m_Engine.addTheory(new Theory(theory));
 	}
     }
+    
+    public void possibleDanger(int p_X, int p_Y) throws Exception
+    {
+	
+    }
 }
