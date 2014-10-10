@@ -8,6 +8,7 @@ package wumpusworld;
 import alice.tuprolog.Prolog;
 import alice.tuprolog.SolveInfo;
 import alice.tuprolog.Theory;
+import java.util.ArrayList;
 
 /**
  *
@@ -34,22 +35,34 @@ public class Logic
     
     public void addRule(int p_X, int p_Y, String p_Type) throws Exception
     {
-	String theory = p_Type + "("+p_X+","+p_Y+").";
+	String theory = appendRule(p_Type, p_X, p_Y);
 	m_Engine.addTheory(new Theory(theory));
     }
     
     public void addVisited(int p_X, int p_Y) throws Exception
     {
-	SolveInfo info = m_Engine.solve("visited" + "("+p_X+","+p_Y+").");
+	SolveInfo info = m_Engine.solve(appendRule("visited", p_X, p_Y));
 	if(!info.isSuccess())
 	{
-	    String theory = "visited" + "("+p_X+","+p_Y+").";
+	    String theory = appendRule("visited", p_X, p_Y);
 	    m_Engine.addTheory(new Theory(theory));
 	}
     }
     
-    public void possibleDanger(int p_X, int p_Y) throws Exception
+    public void addPosibleDanger(int p_X, int p_Y, String p_Type) throws Exception
     {
-	
+	String temp = p_Type + "([" + p_X + "," + p_Y + "],[" + (p_X+1) + "," + p_Y + "]).";
+	SolveInfo info = m_Engine.solve(temp);
+	temp = p_Type + "([" + p_X + "," + p_Y + "],[" + (p_X-1) + "," + p_Y + "]).";
+	info = m_Engine.solve(temp);
+	temp = p_Type + "([" + p_X + "," + p_Y + "],[" + p_X + "," + (p_Y+1) + "]).";
+	info = m_Engine.solve(temp);
+	temp = p_Type + "([" + p_X + "," + p_Y + "],[" + p_X + "," + (p_Y-1) + "]).";
+	info = m_Engine.solve(temp);
+    }
+    
+    public String appendRule(String p_Type, int p_X, int p_Y)
+    {
+	return p_Type + "("+p_X+","+p_Y+").";
     }
 }

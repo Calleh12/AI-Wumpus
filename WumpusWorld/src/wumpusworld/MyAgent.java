@@ -55,6 +55,7 @@ public class MyAgent implements Agent
 	    {
 		System.out.println("I am in a Breeze");
 		m_Logic.addRule(cX, cY, "breeze");
+		m_Logic.addPosibleDanger(cX, cY, "breezy");
 	    }
 	    if (w.hasStench(cX, cY))
 	    {
