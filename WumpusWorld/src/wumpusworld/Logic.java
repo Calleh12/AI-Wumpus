@@ -43,6 +43,11 @@ public class Logic
 	    m_Engine.addTheory(new Theory(at));
     }
     
+    public SolveInfo query(String p_Query) throws Exception
+    {
+        return m_Engine.solve(p_Query);
+    }
+    
     public void possibleLocations(String p_Type, int p_X, int p_Y) throws Exception
     {
 	
