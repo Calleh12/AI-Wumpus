@@ -1,16 +1,13 @@
 %if sats
 %breeze(X) -> true;false.
 
-%-----------------------
-% Rules that add facts -
-%-----------------------
-
-
 
 locate(A, X,Y) :- at(A, X,Y).
 
 at(player, 1,1).
 at(wumpus, 1,2).
+at(breeze, 1,1).
+at(stench, 1,1).
 
 
 
