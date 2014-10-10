@@ -32,6 +32,10 @@ public class MyAgent implements Agent
 	    //Location of the player
 	    int cX = w.getPlayerX();
 	    int cY = w.getPlayerY();
+	    
+	    
+	    m_Logic.addFact(cX,cY,"player");
+	    
 
 	    //Basic action:
 	    //Grab Gold if we can.
@@ -54,23 +58,22 @@ public class MyAgent implements Agent
 	    if (w.hasBreeze(cX, cY))
 	    {
 		System.out.println("I am in a Breeze");
-		m_Logic.addRule(cX, cY, "breeze");
-		m_Logic.addPosibleDanger(cX, cY, "breezy");
+		m_Logic.addFact(cX, cY, "breeze");
 	    }
 	    if (w.hasStench(cX, cY))
 	    {
 		System.out.println("I am in a Stench");
-		m_Logic.addRule(cX, cY, "stench");
+		m_Logic.addFact(cX, cY, "stench");
 	    }
 	    if (w.hasPit(cX, cY))
 	    {
 		System.out.println("I am in a Pit");
-		m_Logic.addRule(cX, cY, "pit");
+		m_Logic.addFact(cX, cY, "pit");
 	    }
 	    if (w.hasWumpus(cY, cY))
 	    {
 		System.out.println("I am at the Wumpus!");
-		m_Logic.addRule(cX, cY, "wumpus");
+		m_Logic.addFact(cX, cY, "wumpus");
 	    }
 	    if (w.getDirection() == World.DIR_RIGHT)
 	    {

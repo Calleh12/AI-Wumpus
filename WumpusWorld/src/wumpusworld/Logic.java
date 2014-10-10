@@ -33,7 +33,13 @@ public class Logic
 	}
     }
     
-    public void addRule(int p_X, int p_Y, String p_Type) throws Exception
+    public void addFact(int p_X, int p_Y, String p_Type) throws Exception
+    {
+	String theory = appendRule(p_Type, p_X, p_Y);
+	m_Engine.addTheory(new Theory(theory));
+    }
+    
+    public void retractFact(int p_X, int p_Y, String p_Type) throws Exception
     {
 	String theory = appendRule(p_Type, p_X, p_Y);
 	m_Engine.addTheory(new Theory(theory));
