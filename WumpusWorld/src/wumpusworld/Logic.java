@@ -35,8 +35,8 @@ public class Logic
     
     public void addLocation(String p_Type, int p_X, int p_Y) throws Exception
     {
-	String at = "at(" + appendRule(p_Type, p_X, p_Y) + ").";
-	String locate = "locate(" + p_Type + ", X, Y).";
+	String at = "at(" + appendString(p_Type, p_X, p_Y) + ").";
+	String locate = "locate(" + appendString(p_Type, p_X, p_Y) + ").";
 	SolveInfo info = m_Engine.solve(locate);
 	System.out.println(info.getQuery().toString());
 	if(!info.isSuccess())
@@ -60,8 +60,9 @@ public class Logic
 	info = m_Engine.solve(temp);
     }
     
-    public String appendRule(String p_Type, int p_X, int p_Y)
+    public String appendString(String p_Type, int p_X, int p_Y)
     {
-	return p_Type + "("+p_X+","+p_Y+").";
+	String temp = p_Type + "," + p_X + "," + p_Y;
+	return temp;
     }
 }
