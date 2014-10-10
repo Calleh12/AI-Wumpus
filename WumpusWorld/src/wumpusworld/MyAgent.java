@@ -33,10 +33,6 @@ public class MyAgent implements Agent
 	    int cX = w.getPlayerX();
 	    int cY = w.getPlayerY();
 	    
-	    
-	    m_Logic.addFact(cX,cY,"player");
-	    
-
 	    //Basic action:
 	    //Grab Gold if we can.
 	    if (w.hasGlitter(cX, cY))
@@ -53,27 +49,22 @@ public class MyAgent implements Agent
 		return;
 	    }
 	    
-	    m_Logic.addVisited(cX, cY);
+	    m_Logic.addLocation("visited", cX, cY);
 	    //Test the environment
 	    if (w.hasBreeze(cX, cY))
 	    {
 		System.out.println("I am in a Breeze");
-		m_Logic.addFact(cX, cY, "breeze");
+		m_Logic.addLocation("breeze", cX, cY);
 	    }
 	    if (w.hasStench(cX, cY))
 	    {
 		System.out.println("I am in a Stench");
-		m_Logic.addFact(cX, cY, "stench");
+		m_Logic.addLocation("stench", cX, cY);
 	    }
 	    if (w.hasPit(cX, cY))
 	    {
 		System.out.println("I am in a Pit");
-		m_Logic.addFact(cX, cY, "pit");
-	    }
-	    if (w.hasWumpus(cY, cY))
-	    {
-		System.out.println("I am at the Wumpus!");
-		m_Logic.addFact(cX, cY, "wumpus");
+		m_Logic.addLocation("pit", cX, cY);
 	    }
 	    if (w.getDirection() == World.DIR_RIGHT)
 	    {

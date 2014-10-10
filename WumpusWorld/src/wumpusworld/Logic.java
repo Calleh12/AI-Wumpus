@@ -33,26 +33,19 @@ public class Logic
 	}
     }
     
-    public void addFact(int p_X, int p_Y, String p_Type) throws Exception
+    public void addLocation(String p_Type, int p_X, int p_Y) throws Exception
     {
-	String theory = appendRule(p_Type, p_X, p_Y);
-	m_Engine.addTheory(new Theory(theory));
-    }
-    
-    public void retractFact(int p_X, int p_Y, String p_Type) throws Exception
-    {
-	String theory = appendRule(p_Type, p_X, p_Y);
-	m_Engine.addTheory(new Theory(theory));
-    }
-    
-    public void addVisited(int p_X, int p_Y) throws Exception
-    {
-	SolveInfo info = m_Engine.solve(appendRule("visited", p_X, p_Y));
+	String at = "at(" + appendRule(p_Type, p_X, p_Y) + ").";
+	String locate = "locate(" + p_Type + ", X, Y).";
+	SolveInfo info = m_Engine.solve(locate);
+	System.out.println(info.getQuery().toString());
 	if(!info.isSuccess())
-	{
-	    String theory = appendRule("visited", p_X, p_Y);
-	    m_Engine.addTheory(new Theory(theory));
-	}
+	    m_Engine.addTheory(new Theory(at));
+    }
+    
+    public void possibleLocations(String p_Type, int p_X, int p_Y) throws Exception
+    {
+	
     }
     
     public void addPosibleDanger(int p_X, int p_Y, String p_Type) throws Exception
