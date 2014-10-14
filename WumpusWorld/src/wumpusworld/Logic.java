@@ -118,7 +118,7 @@ public class Logic
     {
         String add = "add_" + p_Type + "(" + appendPos(p_X, p_Y) + ",A,B).";
         SolveInfo info = m_Engine.solve(add);
-//        
+        
 //        if(info.isSuccess())
 //        {
 //            String x = info.getVarValue("A").toString();
@@ -126,7 +126,7 @@ public class Logic
 //
 //            System.out.println(info.toString() + "\n, added possible wumpus to ("+x+","+y+")");
 //        }
-//        
+        
 //        while(info.hasOpenAlternatives())
 //        {
 //            info = m_Engine.solveNext();
@@ -214,7 +214,7 @@ public class Logic
         return squares;
     }
     
-    public String possibleDangerAhead(int p_X, int p_Y) throws Exception
+    public boolean possibleDangerAhead(int p_X, int p_Y) throws Exception
     {
         String danger = "locate(What," + p_X + "," + p_Y + ").";
         SolveInfo info = m_Engine.solve(danger);
@@ -222,10 +222,18 @@ public class Logic
         if(info.isSuccess())
         {
             String what = info.getVarValue("What").toString();
-            return what;
+            
+            if(what.compareTo("p_wumpus") == 0)
+                return true;
+            else if(what.compareTo("p_pit") == 0)
+                return true;
+            else if(what.compareTo("wumpus") == 0)
+                return true;
+            else if(what.compareTo("pit") == 0)
+                return true;
         }
         
-        return "";
+        return false;
     }
     
     public SolveInfo query(String p_Query) throws Exception

@@ -106,7 +106,7 @@ public class MyAgent implements Agent
             Pos pos = m_Logic.lookAhead(cX, cY, w.getDirection());
             if(pos.x != -1 && pos.y != -1)
             {
-                if(m_Logic.possibleDangerAhead(pos.x, pos.y).compareTo("p_wumpus") == 0)
+                if(m_Logic.possibleDangerAhead(pos.x, pos.y))
                 {
                     int rnd = (int)(Math.random() * 2);
                     if (rnd == 0) 
