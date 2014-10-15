@@ -9,36 +9,17 @@ import alice.tuprolog.*;
 import java.util.ArrayList;
 import java.util.List;
 
-enum Danger
-{
-    PIT(1),
-    WUMPUS(2);
-    
-    private int danger;
-    
-    Danger(int p_Danger)
-    {
-        danger = p_Danger;
-    }
-    
-    public int getValue()
-    {
-        return danger;
-    }
-}
-
 class Pos
 {
     public int x;
     public int y;
 
-    public Pos()
+    public Pos(int p_X, int p_Y)
     {
-        x = -1;
-        y = -1;
+        x = p_X;
+        y = p_Y;
     }
 }
-
 
 class Square
 {
@@ -47,8 +28,8 @@ class Square
     
     public Square()
     {
-        pos = new Pos();
-        type = "unkown";
+        pos = new Pos(-1,1);
+        type = "unknown";
     }
 }
 
@@ -88,18 +69,16 @@ public class Logic
         String solve = "locate(pwumpus,X,Y).";
         SolveInfo info = m_Engine.solve(solve);
         int count = 0;
-        if(info.isSuccess())
-            count = 1;
         
-        while(info.hasOpenAlternatives())
+        while(info.isSuccess())
         {
             count++;
+            if(!info.hasOpenAlternatives())
+                break;
             info = m_Engine.solveNext();
         }
         
-        Pos pos = new Pos();
-        pos.x = -1;
-        pos.y = -1;
+        Pos pos = new Pos(-1,1);
         if(count == 1)
         {
             Term tx = info.getVarValue("X");
@@ -118,26 +97,18 @@ public class Logic
     {
         String add = "add_" + p_Type + "(" + appendPos(p_X, p_Y) + ",A,B).";
         SolveInfo info = m_Engine.solve(add);
-        
-//        if(info.isSuccess())
-//        {
-//            String x = info.getVarValue("A").toString();
-//            String y = info.getVarValue("B").toString();
-//
-//            System.out.println(info.toString() + "\n, added possible wumpus to ("+x+","+y+")");
-//        }
-        
-//        while(info.hasOpenAlternatives())
-//        {
-//            info = m_Engine.solveNext();
-//            if(info.isSuccess())
-//            {
-//                String x = info.getVarValue("A").toString();
-//                String y = info.getVarValue("B").toString();
-//
-//                System.out.println(info.toString() + "\n, added possible wumpus to ("+x+","+y+")");
-//            }
-//        }
+                
+        while(info.isSuccess())
+        {
+                String x = info.getVarValue("A").toString();
+                String y = info.getVarValue("B").toString();
+
+                System.out.println(info.toString() + "\n, added to ("+x+","+y+")");
+            
+             if(!info.hasOpenAlternatives())
+                break;
+            info = m_Engine.solveNext();
+        }
     }
     
     public void removeLocationsWith(String p_Type) throws Exception
@@ -163,66 +134,93 @@ public class Logic
         return false;
     }
     
-    public Pos lookAhead(int p_X, int p_Y, int p_Dir) throws Exception
+    public Pos look(int p_X, int p_Y, int p_Dir) throws Exception
     {
-        String look = "lookahead("+p_X +","+ p_Y +","+ p_Dir +",X,Y).";
+        String look = "look("+p_X +","+ p_Y +","+ p_Dir +",X,Y).";
         SolveInfo info = m_Engine.solve(look);
         
-        Pos pos = new Pos();
+        Pos pos = new Pos(-1,-1);
         if(info.isSuccess())
         {
-            Term tx = info.getVarValue("X");
-            String sx = tx.toString();
-            pos.x = Integer.parseInt(sx);
-            Term ty = info.getVarValue("Y");
-            String sy = ty.toString();
-            pos.y = Integer.parseInt(sy);
+            pos.x = Integer.parseInt(info.getVarValue("X").toString());
+            pos.y = Integer.parseInt(info.getVarValue("Y").toString());
         }
         
         return pos;
     }
-    
+            
     public ArrayList<Square> locateAround(int p_X, int p_Y) throws Exception
-    {
+    {        
         String around = "locatearound(" + p_X + "," + p_Y + ", What, A,B).";
+        SolveInfo info = m_Engine.solve(around);
+        
         
         ArrayList<Square> squares = new ArrayList<Square>();
-        
-        SolveInfo info = m_Engine.solve(around);
-        if(info.isSuccess())
+        while(info.isSuccess())
         {
             Square square = new Square();
+           
             square.pos.x = Integer.parseInt(info.getVarValue("A").toString());
             square.pos.y = Integer.parseInt(info.getVarValue("B").toString());
             square.type = info.getVarValue("What").toString();
             squares.add(square);
-        }
-        
-        while(info.hasOpenAlternatives())
-        {
-            Square square = new Square();
+            
+            if(!info.hasOpenAlternatives())
+                break;
             info = m_Engine.solveNext();
-            if(info.isSuccess())
-            {
-                square.pos.x = Integer.parseInt(info.getVarValue("A").toString());
-                square.pos.y = Integer.parseInt(info.getVarValue("B").toString());
-                square.type = info.getVarValue("What").toString();
-                squares.add(square);
-            }
+            
         }
         
         return squares;
     }
     
-    public boolean possibleDangerAhead(int p_X, int p_Y) throws Exception
+    public int moveDir(int p_X, int p_Y, int p_Gx, int p_Gy) throws Exception
     {
-        String danger = "locate(What," + p_X + "," + p_Y + ").";
-        SolveInfo info = m_Engine.solve(danger);
+        String dir = "moveDir("+p_X +","+ p_Y +","+ p_Gx +","+p_Gy+", D).";
+        SolveInfo info = m_Engine.solve(dir);
         
         if(info.isSuccess())
         {
-            String what = info.getVarValue("What").toString();
+           return Integer.parseInt(info.getVarValue("D").toString());
+        }
+        
+        return -1;
+    }
+    
+    public ArrayList<Square> locateAllAt(int p_X, int p_Y) throws Exception
+    {
+        String around = "locate(What," + p_X + "," + p_Y + ").";
+        
+        ArrayList<Square> what = new ArrayList<Square>();
+        
+        Square square = new Square();
+        square.pos.x = p_X;
+        square.pos.y = p_Y;
+        
+        SolveInfo info = m_Engine.solve(around);
+
+        while(info.isSuccess())
+        {
+            square.type = info.getVarValue("What").toString();
+            what.add(square);
             
+             if(!info.hasOpenAlternatives())
+                break;
+            info = m_Engine.solveNext();
+        }
+        
+        return what;
+    }
+    
+    public boolean possibleDangerIn(int p_X, int p_Y) throws Exception
+    {
+        String danger = "locate(What," + p_X + "," + p_Y + ").";
+        SolveInfo info = m_Engine.solve(danger);
+ 
+        while(info.isSuccess())
+        {
+            String what = info.getVarValue("What").toString();
+
             if(what.compareTo("p_wumpus") == 0)
                 return true;
             else if(what.compareTo("p_pit") == 0)
@@ -231,6 +229,10 @@ public class Logic
                 return true;
             else if(what.compareTo("pit") == 0)
                 return true;
+            
+            if(!info.hasOpenAlternatives())
+                break;
+            info = m_Engine.solveNext();
         }
         
         return false;
