@@ -17,6 +17,7 @@ public class MyAgent implements Agent
     private Logic m_Logic;
     private Pos goalPos;
     private Pos lastGoalPos;
+    private int m_LastDir;
     /**
      * Creates a new instance of your solver agent.
      * 
@@ -28,6 +29,7 @@ public class MyAgent implements Agent
 	m_Logic = new Logic();
         goalPos = new Pos(w.getPlayerX(),w.getPlayerY());
         lastGoalPos = new Pos(-1, -1);
+        m_LastDir = -1;
     }
     
     /**
@@ -56,7 +58,7 @@ public class MyAgent implements Agent
 		w.doAction(World.A_CLIMB);
 		return;
 	    }
-            
+            m_Logic.solve("updatePlayer("+cX+","+cY+",A,B).");
 	    //Test the environment
 	    if (w.hasBreeze(cX, cY))
 	    {
@@ -111,71 +113,128 @@ public class MyAgent implements Agent
             {
                 for(int i = 0; i < 4; i++)
                 {
-                    Pos pos = m_Logic.look(cX, cY, i);
-                    if(pos.x == -1 || pos.y == -1)
-                        continue;
-                    types = m_Logic.locateAllAt(pos.x, pos.y);
-                    
-                    if(types.isEmpty() || types.size() == 1 && types.get(0).compareTo("visited") == 0)
+//                    Pos pos = m_Logic.look(cX, cY, i);
+//                    if(pos.x == -1 || pos.y == -1)
+//                        continue;
+//                    types = m_Logic.locateAllAt(pos.x, pos.y);
+//                    
+//                    if(types.isEmpty() || types.size() == 1 && types.get(0).compareTo("visited") == 0)
+//                    {
+//                        goalPos = pos;
+//                        break;
+//                    }
+//                    else
+//                    {
+//                        for (String type : types) 
+//                        {
+//                            String temp = type;
+//                            if(temp.compareTo("p_wumpus") == 0)
+//                            {
+//                                break;
+//                            }
+//                            else if(temp.compareTo("wumpus") == 0)
+//                            {
+//                                wumpusDir = i;
+//                                break;
+//                            }
+//                            else if(temp.compareTo("p_pit") == 0)
+//                            {
+//                                break;
+//                            }
+//                            else if(temp.compareTo("pit") == 0)
+//                            {
+//                                break;
+//                            }
+//                            else if(temp.compareTo("visited") == 0)
+//                            {
+//                                goalPos = pos;
+//                            }
+//                        }
+//                    }
+                }
+            }
+            
+            Pos pos = m_Logic.look(cX, cY, w.getDirection());
+            if(pos.x != -1 || pos.y != -1)
+            {
+                types = m_Logic.locateAllAt(pos.x, pos.y);
+
+
+                if(types.isEmpty())// && m_LastDir != w.getDirection())// || types.size() == 1 && types.get(0).compareTo("visited") == 0)
+                {
+                    m_LastDir = w.getDirection();
+                    w.doAction(World.A_MOVE);
+                    return;
+                    //goalPos = pos;
+                }
+                else
+                {
+                    for (String type : types) 
                     {
-                        goalPos = pos;
-                        break;
-                    }
-                    else
-                    {
-                        for (String type : types) 
+                        String temp = type;
+                        if(temp.compareTo("p_wumpus") == 0)
                         {
-                            String temp = type;
-                            if(temp.compareTo("p_wumpus") == 0)
-                            {
-                                break;
-                            }
-                            else if(temp.compareTo("wumpus") == 0)
-                            {
-                                wumpusDir = i;
-                                break;
-                            }
-                            else if(temp.compareTo("p_pit") == 0)
-                            {
-                                break;
-                            }
-                            else if(temp.compareTo("pit") == 0)
-                            {
-                                break;
-                            }
-                            else if(temp.compareTo("visited") == 0)
-                            {
-                                goalPos = pos;
-                            }
+                            break;
+                        }
+                        else if(temp.compareTo("wumpus") == 0)
+                        {
+                            w.doAction(World.A_SHOOT);
+                            return;
+                        }
+                        else if(temp.compareTo("p_pit") == 0)
+                        {
+                            break;
+                        }
+                        else if(temp.compareTo("pit") == 0)
+                        {
+                            break;
+                        }
+                        else if(temp.compareTo("visited") == 0 && m_LastDir != w.getDirection())
+                        {
+                            m_LastDir = w.getDirection();
+                            w.doAction(World.A_MOVE);
+                            return;
                         }
                     }
                 }
             }
             
-            int dir = m_Logic.moveDir(cX, cY, goalPos.x, goalPos.y);
-            if(wumpusDir != -1)
-            {
-                if(wumpusDir > w.getDirection())
-                    w.doAction(w.A_TURN_RIGHT);
-                if(wumpusDir < w.getDirection())
-                    w.doAction(World.A_TURN_LEFT);
-                if(wumpusDir == w.getDirection())
-                    w.doAction(World.A_SHOOT);
-                
-                return;
-            }
-            else if(dir == w.getDirection())
-            {
-                w.doAction(World.A_MOVE);
-            }
-            else if(dir < w.getDirection() && dir != -1)
+             int rnd = (int)(Math.random() * 2);
+            if (rnd == 0) 
             {
                 w.doAction(World.A_TURN_LEFT);
+                return;
             }
-            else if(dir > w.getDirection() && dir != -1)
+            if (rnd == 1)
             {
                 w.doAction(World.A_TURN_RIGHT);
+                return;
             }
+            
+//            int dir = m_Logic.moveDir(cX, cY, goalPos.x, goalPos.y);
+//            if(wumpusDir != -1)
+//            {
+//                if(wumpusDir > w.getDirection())
+//                    w.doAction(w.A_TURN_RIGHT);
+//                if(wumpusDir < w.getDirection())
+//                    w.doAction(World.A_TURN_LEFT);
+//                if(wumpusDir == w.getDirection())
+//                    w.doAction(World.A_SHOOT);
+//                
+//                return;
+//            }
+//            else if(dir == w.getDirection())
+//            {
+//                w.doAction(World.A_MOVE);
+//            }
+//            else if(dir < w.getDirection() && dir != -1)
+//            {
+//                w.doAction(World.A_TURN_LEFT);
+//            }
+//            else if(dir > w.getDirection() && dir != -1)
+//            {
+//                w.doAction(World.A_TURN_RIGHT);
+//            }
 //            Square square = m_Logic.lookAtWithDir(cX, cY, w.getDirection());
 //            if(square.pos.x != -1 && square.pos.y != -1)
 //            {
