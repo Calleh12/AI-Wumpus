@@ -3,6 +3,7 @@ package wumpusworld;
 import alice.tuprolog.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Contans starting code for creating your own Wumpus World agent.
@@ -15,7 +16,7 @@ public class MyAgent implements Agent
     private World w;
     private Logic m_Logic;
     private Pos goalPos;
-    ArrayList<String> moves = new ArrayList<String>();
+    private Pos lastGoalPos;
     /**
      * Creates a new instance of your solver agent.
      * 
@@ -26,21 +27,7 @@ public class MyAgent implements Agent
         w = world;
 	m_Logic = new Logic();
         goalPos = new Pos(w.getPlayerX(),w.getPlayerY());
-        
-        moves.add(World.A_MOVE);
-        moves.add(World.A_MOVE);
-        moves.add(World.A_TURN_LEFT);
-        moves.add(World.A_TURN_LEFT);
-        moves.add(World.A_MOVE);
-        moves.add(World.A_MOVE);
-        moves.add(World.A_TURN_RIGHT);
-        moves.add(World.A_MOVE);
-        moves.add(World.A_MOVE);
-        moves.add(World.A_TURN_RIGHT);
-        moves.add(World.A_TURN_RIGHT);
-        moves.add(World.A_MOVE);
-        moves.add(World.A_MOVE);
-        moves.add(World.A_MOVE);
+        lastGoalPos = new Pos(-1, -1);
     }
     
     /**
@@ -69,7 +56,7 @@ public class MyAgent implements Agent
 		w.doAction(World.A_CLIMB);
 		return;
 	    }
-	    
+            
 	    //Test the environment
 	    if (w.hasBreeze(cX, cY))
 	    {
@@ -114,7 +101,12 @@ public class MyAgent implements Agent
 //                    int hej = 0;
 //                }
 //            }
-            ArrayList<Square> squares = new ArrayList<Square>();
+            if(!w.wumpusAlive())
+            {
+                m_Logic.solve("removeAll(wumpus).");
+            }
+            int wumpusDir = -1;
+            ArrayList<String> types;            
             if(goalPos.x == cX && goalPos.y == cY)
             {
                 for(int i = 0; i < 4; i++)
@@ -122,40 +114,67 @@ public class MyAgent implements Agent
                     Pos pos = m_Logic.look(cX, cY, i);
                     if(pos.x == -1 || pos.y == -1)
                         continue;
-                    squares = m_Logic.locateAllAt(pos.x, pos.y);
+                    types = m_Logic.locateAllAt(pos.x, pos.y);
                     
-                     if(squares.size() == 0)
-                     {
-                         goalPos = pos;
-                         break;
-                     }
-                     else
-                     {
-                         for(int j = 0; j < squares.size(); j++)
-                         {
-                             String temp = squares.get(j).type;
-                             if(temp.compareTo("p_wumpus") != 0 &&
-                                     temp.compareTo("wumpus") != 0 &&
-                                     temp.compareTo("p_pit") != 0 &&
-                                     temp.compareTo("pit") != 0)
-                                 goalPos = pos;
-                         }
-                     }
+                    if(types.isEmpty() || types.size() == 1 && types.get(0).compareTo("visited") == 0)
+                    {
+                        goalPos = pos;
+                        break;
+                    }
+                    else
+                    {
+                        for (String type : types) 
+                        {
+                            String temp = type;
+                            if(temp.compareTo("p_wumpus") == 0)
+                            {
+                                break;
+                            }
+                            else if(temp.compareTo("wumpus") == 0)
+                            {
+                                wumpusDir = i;
+                                break;
+                            }
+                            else if(temp.compareTo("p_pit") == 0)
+                            {
+                                break;
+                            }
+                            else if(temp.compareTo("pit") == 0)
+                            {
+                                break;
+                            }
+                            else if(temp.compareTo("visited") == 0)
+                            {
+                                goalPos = pos;
+                            }
+                        }
+                    }
                 }
             }
             
             int dir = m_Logic.moveDir(cX, cY, goalPos.x, goalPos.y);
-            if(dir == w.getDirection())
+            if(wumpusDir != -1)
             {
-                w.doAction(w.A_MOVE);
+                if(wumpusDir > w.getDirection())
+                    w.doAction(w.A_TURN_RIGHT);
+                if(wumpusDir < w.getDirection())
+                    w.doAction(World.A_TURN_LEFT);
+                if(wumpusDir == w.getDirection())
+                    w.doAction(World.A_SHOOT);
+                
+                return;
+            }
+            else if(dir == w.getDirection())
+            {
+                w.doAction(World.A_MOVE);
             }
             else if(dir < w.getDirection() && dir != -1)
             {
-                w.doAction(w.A_TURN_LEFT);
+                w.doAction(World.A_TURN_LEFT);
             }
             else if(dir > w.getDirection() && dir != -1)
             {
-                w.doAction(w.A_TURN_RIGHT);
+                w.doAction(World.A_TURN_RIGHT);
             }
 //            Square square = m_Logic.lookAtWithDir(cX, cY, w.getDirection());
 //            if(square.pos.x != -1 && square.pos.y != -1)

@@ -31,6 +31,12 @@ class Square
         pos = new Pos(-1,1);
         type = "unknown";
     }
+    
+    public Square(Pos p_Pos, String p_Type)
+    {
+        pos = p_Pos;
+        type = p_Type;
+    }
 }
 
 /**
@@ -187,22 +193,18 @@ public class Logic
         return -1;
     }
     
-    public ArrayList<Square> locateAllAt(int p_X, int p_Y) throws Exception
+    public ArrayList<String> locateAllAt(int p_X, int p_Y) throws Exception
     {
         String around = "locate(What," + p_X + "," + p_Y + ").";
         
-        ArrayList<Square> what = new ArrayList<Square>();
-        
-        Square square = new Square();
-        square.pos.x = p_X;
-        square.pos.y = p_Y;
-        
+        ArrayList<String> what = new ArrayList<String>();
         SolveInfo info = m_Engine.solve(around);
 
         while(info.isSuccess())
         {
-            square.type = info.getVarValue("What").toString();
-            what.add(square);
+            String type = "";
+            type = info.getVarValue("What").toString();
+            what.add(type);
             
              if(!info.hasOpenAlternatives())
                 break;
@@ -210,6 +212,34 @@ public class Logic
         }
         
         return what;
+    }
+    
+    public String locateDanger(int p_X, int p_Y) throws Exception
+    {
+        String type = "";
+        String danger = "locateDanger(What," + p_X + "," + p_Y + ").";
+        SolveInfo info = m_Engine.solve(danger);
+        
+        if(info.isSuccess())
+        {
+            type = info.getVarValue("What").toString();
+        }
+        
+        return type;
+    }
+    
+    public String locateWhat(int p_X, int p_Y) throws Exception
+    {
+        String type = "";
+        String locate = "locate(What," + p_X + "," + p_Y + ").";
+        SolveInfo info = m_Engine.solve(locate);
+        
+        if(info.isSuccess())
+        {
+            type = info.getVarValue("What").toString();
+        }
+        
+        return type;
     }
     
     public boolean possibleDangerIn(int p_X, int p_Y) throws Exception
@@ -238,7 +268,7 @@ public class Logic
         return false;
     }
     
-    public SolveInfo query(String p_Query) throws Exception
+    public SolveInfo solve(String p_Query) throws Exception
     {
         return m_Engine.solve(p_Query);
     }
