@@ -154,6 +154,18 @@ public class Logic
         
         return pos;
     }
+    
+    public boolean isAdjacent(int p_X, int p_Y, int p_A, int p_B) throws Exception
+    {
+        String adjacent = "adjacent(" + p_X + "," + p_Y + "," + p_A + "," + p_B + ").";
+        SolveInfo info = m_Engine.solve(adjacent);
+        
+        if(info.isSuccess())
+        {
+            return true;
+        }
+        return false;
+    }
             
     public ArrayList<Square> locateAround(int p_X, int p_Y) throws Exception
     {        
@@ -214,18 +226,19 @@ public class Logic
         return what;
     }
     
-    public String locateDanger(int p_X, int p_Y) throws Exception
+    public boolean locateDanger(int p_X, int p_Y, int p_Danger) throws Exception
     {
         String type = "";
-        String danger = "locateDanger(What," + p_X + "," + p_Y + ").";
+        String danger = "locateDanger(What," + p_X + "," + p_Y + "," + p_Danger+").";
         SolveInfo info = m_Engine.solve(danger);
         
         if(info.isSuccess())
         {
             type = info.getVarValue("What").toString();
+            return true;
         }
         
-        return type;
+        return false;
     }
     
     public String locateWhat(int p_X, int p_Y) throws Exception
