@@ -208,6 +208,8 @@ public class MyAgent implements Agent
         return new Pos(-1,-1);
     }
     
+    
+    
     /**
      * Asks your solver agent to execute an action.
      */
@@ -249,7 +251,7 @@ public class MyAgent implements Agent
 	    if (w.hasPit(cX, cY))
 	    {
 		System.out.println("I am in a Pit");
-		m_Logic.addLocation("pit", cX, cY);
+		//m_Logic.addLocation("pit", cX, cY);
 	    }
 	    if (w.getDirection() == World.DIR_RIGHT)
 	    {
@@ -276,35 +278,39 @@ public class MyAgent implements Agent
                 m_Logic.solve("removeAll(wumpus).");
             }
             
+            if(cX == 1 && cY == 1)
+            {
+                Pos pos = m_Logic.look(cX, cY, w.getDirection());
+                ArrayList<String> types = m_Logic.locateAllAt(pos.x, pos.y);
+                for(String type : types)
+                {
+                    if(type.compareTo("p_wumpus") == 0)
+                    {
+                        w.doAction(World.A_SHOOT);
+                        String s = "retract(at(p_wumpus,"+pos.x+","+pos.y+")).";
+                        m_Logic.solve(s);
+                        return;
+                    }
+                    
+                    if(type.compareTo("p_pit") == 0)
+                    {
+                        if(!w.hasArrow())
+                        {
+                            w.doAction(World.A_MOVE);
+                            return;
+                        }
+                    }
+                }
+            }
+            
             Pos start = new Pos(cX,cY);
             
             ArrayList<String> sTypes = new ArrayList<>();
             m_Map.clear();
             
             int danger = 4;
-            for(int i = 1; i < 5; i++)
-            {
-                for(int j = 1; j < 5; j++)
-                {
-                    sTypes = m_Logic.locateAllAt(j, i);
-                    m_Map.add(sTypes);
-                }
-            }
+            danger = pathFind(start, danger);
             
-            if(m_Path.isEmpty())
-            {
-                Pos goal = findGoalPos();
-                
-                m_Path = aStarPath(start.x, start.y, goal.x, goal.y, danger);
-                while(m_Path == null)
-                {
-                    m_Path = aStarPath(start.x, start.y, goal.x, goal.y, danger--);
-                    if(danger <= 0)
-                        break;
-                }
-            } 
-            
-           
             int dir = m_Logic.moveDir(cX, cY, m_Path.get(0).x, m_Path.get(0).y);
             if(dir == w.getDirection())
             {
@@ -318,6 +324,11 @@ public class MyAgent implements Agent
                         return;
                     }
                     if(what.compareTo("p_wumpus") == 0)
+                    {
+                        m_Path.clear();
+                        return;
+                    }
+                    if(danger >= 4 && what.compareTo("p_pit") == 0)
                     {
                         m_Path.clear();
                         return;
@@ -342,55 +353,36 @@ public class MyAgent implements Agent
             {
                 w.doAction(World.A_TURN_RIGHT);
             }
-//            Square square = m_Logic.lookAtWithDir(cX, cY, w.getDirection());
-//            if(square.pos.x != -1 && square.pos.y != -1)
-//            {
-//                if(m_Logic.possibleDangerIn(square.pos.x, square.pos.y))
-//                {
-//                    int rnd = (int)(Math.random() * 2);
-//                    if (rnd == 0) 
-//                    {
-//                        w.doAction(World.A_TURN_LEFT);
-//                        return;
-//                    }
-//                    if (rnd == 1)
-//                    {
-//                        w.doAction(World.A_TURN_RIGHT);
-//                        return;
-//                    }
-//                }
-//                else
-//                {
-//                    w.doAction(w.A_MOVE);
-//                    return;
-//                }
-//            }
-//            else
-//            {
-//                //Failsafe against invalid squares
-//                //Random move actions
-//                int rnd = (int)(Math.random() * 2);
-//                if (rnd == 0) 
-//                {
-//                    w.doAction(World.A_TURN_LEFT);
-//                    return;
-//                }
-//                if (rnd == 1)
-//                {
-//                    w.doAction(World.A_TURN_RIGHT);
-//                    return;
-//                }
-//            }
-//            if(moves.size() > 0)
-//            {
-//                w.doAction(moves.get(0));
-//                moves.remove(0);
-//            }
 	}
 	
 	catch(Exception e)
 	{
 	    System.out.println("Something went wrong, error: " + e.getMessage());
 	}
+    }
+
+    private int pathFind(Pos start, int danger) throws Exception {
+        ArrayList<String> sTypes;
+        for(int i = 1; i < 5; i++)
+        {
+            for(int j = 1; j < 5; j++)
+            {
+                sTypes = m_Logic.locateAllAt(j, i);
+                m_Map.add(sTypes);
+            }
+        }
+        if(m_Path != null && m_Path.isEmpty())
+        {
+            Pos goal = findGoalPos();
+            
+            m_Path = aStarPath(start.x, start.y, goal.x, goal.y, danger);
+            while(m_Path == null)
+            {
+                m_Path = aStarPath(start.x, start.y, goal.x, goal.y, danger--);
+                if(danger <= 0)
+                    break;
+            }
+        }
+        return danger;
     }
 }

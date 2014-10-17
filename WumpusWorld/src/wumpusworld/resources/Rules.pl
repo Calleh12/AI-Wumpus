@@ -40,8 +40,6 @@ at(p_wumpus,3,1).
 at(visited,2,1).
 */
 
-
-
 at(player,1,1).
 			
 findPit(X,Y,A,B) :- not(locate(visited,X,Y)), locatearound(X,Y,breeze,A,B), locate(player,Z,W), (Z =\= A, W =\= B), locate(breeze,A,B), locate(visited,A,B).
