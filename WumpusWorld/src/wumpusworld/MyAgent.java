@@ -251,7 +251,7 @@ public class MyAgent implements Agent
 	    if (w.hasPit(cX, cY))
 	    {
 		System.out.println("I am in a Pit");
-		//m_Logic.addLocation("pit", cX, cY);
+		m_Logic.addLocation("pit", cX, cY);
 	    }
 	    if (w.getDirection() == World.DIR_RIGHT)
 	    {

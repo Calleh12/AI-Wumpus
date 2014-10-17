@@ -47,43 +47,33 @@ findPit(X,Y,A,B) :- not(locate(visited,X,Y)), locatearound(X,Y,breeze,A,B), loca
 findWumpus(X,Y,A,B) :- not(locate(visited,X,Y)), locatearound(X,Y,stench,A,B), locate(player,Z,W), (Z =\= A, W =\= B), locate(stench,A,B), locate(visited,A,B).
 
 test_stench(X,Y,A,B) :-	A is X, B is Y+1, findWumpus(A,B,Z,W), add_location(wumpus,A,B).
-find_wumpus(X,Y,A,B) :- 
-			not(locate(visited,X,Y)), adj(0, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(stench,A,B), locate(player,R,T), (R =\= A; T =\= B);
-			not(locate(visited,X,Y)), adj(1, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(stench,A,B), locate(player,R,T), (R =\= A; T =\= B);
-			not(locate(visited,X,Y)), adj(2, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(stench,A,B), locate(player,R,T), (R =\= A; T =\= B);
-			not(locate(visited,X,Y)), adj(3, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(stench,A,B), locate(player,R,T), (R =\= A; T =\= B).
-			
-find_pit(X,Y,A,B) :- 
-			not(locate(visited,X,Y)), adj(0, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(breeze,A,B), locate(player,R,T), (R =\= A; T =\= B);
-			not(locate(visited,X,Y)), adj(1, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(breeze,A,B), locate(player,R,T), (R =\= A; T =\= B);
-			not(locate(visited,X,Y)), adj(2, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(breeze,A,B), locate(player,R,T), (R =\= A; T =\= B);
-			not(locate(visited,X,Y)), adj(3, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(breeze,A,B), locate(player,R,T), (R =\= A; T =\= B).
+find_adjacent(X,Y,A,B,O) :- 
+			not(locate(visited,X,Y)), adj(0, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(O,A,B), locate(player,R,T), (R =\= A; T =\= B);
+			not(locate(visited,X,Y)), adj(1, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(O,A,B), locate(player,R,T), (R =\= A; T =\= B);
+			not(locate(visited,X,Y)), adj(2, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(O,A,B), locate(player,R,T), (R =\= A; T =\= B);
+			not(locate(visited,X,Y)), adj(3, [Z,W]), A is X+Z, B is Y+W, inside_map(A,B), locate(O,A,B), locate(player,R,T), (R =\= A; T =\= B).
 
 add_stench(X,Y,A,B) :- add_location(stench,X,Y);
 			A is X+1, B is Y, not(locate(visited,A,B)), add_location(p_wumpus,A,B);
 			A is X-1, B is Y, not(locate(visited,A,B)), add_location(p_wumpus,A,B);
 			A is X, B is Y+1, not(locate(visited,A,B)), add_location(p_wumpus,A,B);
 			A is X, B is Y-1, not(locate(visited,A,B)), add_location(p_wumpus,A,B);
-			A is X+1, B is Y, find_wumpus(A,B,Z,W), add_location(wumpus,A,B);
-			A is X-1, B is Y, find_wumpus(A,B,Z,W), add_location(wumpus,A,B);
-			A is X, B is Y+1, find_wumpus(A,B,Z,W), add_location(wumpus,A,B);
-			A is X, B is Y-1, find_wumpus(A,B,Z,W), add_location(wumpus,A,B).
+			A is X+1, B is Y, find_adjacent(A,B,Z,W, stench), add_location(wumpus,A,B);
+			A is X-1, B is Y, find_adjacent(A,B,Z,W, stench), add_location(wumpus,A,B);
+			A is X, B is Y+1, find_adjacent(A,B,Z,W, stench), add_location(wumpus,A,B);
+			A is X, B is Y-1, find_adjacent(A,B,Z,W, stench), add_location(wumpus,A,B).
 				
 add_breeze(X,Y,A,B) :- add_location(breeze,X,Y); 
 			A is X+1, B is Y, not(locate(visited,A,B)), add_location(p_pit,A,Y);
 			A is X-1, B is Y, not(locate(visited,A,B)), add_location(p_pit,A,Y);
 			A is X, B is Y+1, not(locate(visited,A,B)), add_location(p_pit,X,B);
 			A is X, B is Y-1, not(locate(visited,A,B)), add_location(p_pit,X,B);
-			A is X+1, B is Y, find_pit(A,B,Z,W), add_location(pit,A,B);
-			A is X-1, B is Y, find_pit(A,B,Z,W), add_location(pit,A,B);
-			A is X, B is Y+1, find_pit(A,B,Z,W), add_location(pit,A,B);
-			A is X, B is Y-1, find_pit(A,B,Z,W), add_location(pit,A,B).
+			A is X+1, B is Y, find_adjacent(A,B,Z,W,breeze), add_location(pit,A,B);
+			A is X-1, B is Y, find_adjacent(A,B,Z,W,breeze), add_location(pit,A,B);
+			A is X, B is Y+1, find_adjacent(A,B,Z,W,breeze), add_location(pit,A,B);
+			A is X, B is Y-1, find_adjacent(A,B,Z,W,breeze), add_location(pit,A,B).
 				
-add_pit(X,Y,A,B) :- add_location(pit,X,Y); 
-			A is X+1, add_location(breeze,A,Y);
-			A is X-1, add_location(breeze,A,Y);
-			B is Y+1, add_location(breeze,X,B);
-			B is Y-1, add_location(breeze,X,B).
+add_pit(X,Y,A,B) :- add_location(pit,X,Y).
 			
 removeAll(What) :- retract(at(What,X,Y)).
 				
@@ -99,6 +89,10 @@ add_visited(X,Y,A,B) :- add_location(visited,X,Y);
 			locate(p_wumpus, X,Y), retract(at(p_wumpus, X,Y));
 			locate(p_pit, X,Y), retract(at(p_pit, X,Y));
 			locate(wumpus,A,B), retract(at(p_wumpus,Z,W));
+			A is X+1, B is Y, find_adjacent(A,B,Z,W,breeze), retract(at(p_wumpus,A,B)); 
+			A is X-1, B is Y, find_adjacent(A,B,Z,W,breeze), retract(at(p_wumpus,A,B));
+			A is X, B is Y+1, find_adjacent(A,B,Z,W,breeze), retract(at(p_wumpus,A,B)); 
+			A is X, B is Y-1, find_adjacent(A,B,Z,W,breeze), retract(at(p_wumpus,A,B)).
 			locatearound(X,Y,pit,Z,W), remove_p_pit(X,Y,A,B).
 			
 remove_p_pit(X,Y,A,B) :- 
