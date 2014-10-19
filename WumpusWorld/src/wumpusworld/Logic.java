@@ -45,8 +45,6 @@ class Square
  */
 public class Logic 
 {
-   
-    
     private Prolog m_Engine;
     
     public Logic()
@@ -86,29 +84,6 @@ public class Logic
             info = m_Engine.solveNext();
         }
     }
-    
-//    public void removeLocationsWith(String p_Type) throws Exception
-//    {
-//        String remove = "retract(at(" + p_Type + ",X,Y)).";
-//        m_Engine.solve(remove);
-//    }
-    
-//    public void removeLocation(int p_X, int p_Y) throws Exception
-//    {
-//        String remove = "retract(at(O," + appendPos(p_X, p_Y) + ")).";
-//        m_Engine.solve(remove);
-//    }
-    
-//    public boolean locate(String p_Type, int p_X, int p_Y) throws Exception
-//    {
-//	String locate = "locate(" + appendType(p_Type, p_X, p_Y) + ").";
-//	SolveInfo info = m_Engine.solve(locate);
-//        
-//        if(info.isSuccess())
-//            return true;
-//        
-//        return false;
-//    }
     /**
      * Used to look at a adjacent square with the direction.
      * @param p_X, current position X
@@ -151,31 +126,6 @@ public class Logic
         }
         return false;
     }
-            
-//    public ArrayList<Square> locateAround(int p_X, int p_Y) throws Exception
-//    {        
-//        String around = "locatearound(" + p_X + "," + p_Y + ", What, A,B).";
-//        SolveInfo info = m_Engine.solve(around);
-//        
-//        
-//        ArrayList<Square> squares = new ArrayList<Square>();
-//        while(info.isSuccess())
-//        {
-//            Square square = new Square();
-//           
-//            square.pos.x = Integer.parseInt(info.getVarValue("A").toString());
-//            square.pos.y = Integer.parseInt(info.getVarValue("B").toString());
-//            square.type = info.getVarValue("What").toString();
-//            squares.add(square);
-//            
-//            if(!info.hasOpenAlternatives())
-//                break;
-//            info = m_Engine.solveNext();
-//            
-//        }
-//        
-//        return squares;
-//    }
     /**
      * It determines the direction to be headed for the GxGy pos.
      * @param p_X, from this pos.x
@@ -246,46 +196,6 @@ public class Logic
         
         return false;
     }
-    
-//    public String locateWhat(int p_X, int p_Y) throws Exception
-//    {
-//        String type = "";
-//        String locate = "locate(What," + p_X + "," + p_Y + ").";
-//        SolveInfo info = m_Engine.solve(locate);
-//        
-//        if(info.isSuccess())
-//        {
-//            type = info.getVarValue("What").toString();
-//        }
-//        
-//        return type;
-//    }
-    
-//    public boolean possibleDangerIn(int p_X, int p_Y) throws Exception
-//    {
-//        String danger = "locate(What," + p_X + "," + p_Y + ").";
-//        SolveInfo info = m_Engine.solve(danger);
-// 
-//        while(info.isSuccess())
-//        {
-//            String what = info.getVarValue("What").toString();
-//
-//            if(what.compareTo("p_wumpus") == 0)
-//                return true;
-//            else if(what.compareTo("p_pit") == 0)
-//                return true;
-//            else if(what.compareTo("wumpus") == 0)
-//                return true;
-//            else if(what.compareTo("pit") == 0)
-//                return true;
-//            
-//            if(!info.hasOpenAlternatives())
-//                break;
-//            info = m_Engine.solveNext();
-//        }
-//        
-//        return false;
-//    }
     /**
      * Just solves the query that is sent.
      * @param p_Query, query that needs to be solved.
