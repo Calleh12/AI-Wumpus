@@ -39,9 +39,6 @@ public class MyAgent implements Agent
     
     private World w;
     private Logic m_Logic;
-    private Pos goalPos;
-    private Pos lastGoalPos;
-    private int m_LastDir;
     private ArrayList<Node> m_Path;
     private ArrayList<ArrayList<String>> m_Map;
     /**
@@ -53,9 +50,6 @@ public class MyAgent implements Agent
     {
         w = world;
 	m_Logic = new Logic();
-        goalPos = new Pos(w.getPlayerX(),w.getPlayerY());
-        lastGoalPos = new Pos(-1, -1);
-        m_LastDir = -1;
         m_Path = new ArrayList<>();
         m_Map = new ArrayList<ArrayList<String>>();
     }
@@ -143,7 +137,7 @@ public class MyAgent implements Agent
                 if(exists)
                     continue;
                 //calculate the new g score for the neighbour.
-                int g = current.g + Math.abs(current.x-neighbour.x) + Math.abs(current.y-neighbour.y);
+                int g = current.g + 1;//Math.abs(current.x-neighbour.x) + Math.abs(current.y-neighbour.y);
                //checks the if the neighbour exists in the open list.
                 for(Node nodes : open)
                 {
@@ -247,7 +241,7 @@ public class MyAgent implements Agent
 //            }
 //        }
         //If there exist a goal to be reached no need to search again. 
-        if(m_Path.isEmpty())
+        if(m_Path == null || m_Path.isEmpty())
         {
             Pos goal = findGoalPos();
             
@@ -349,11 +343,7 @@ public class MyAgent implements Agent
             //m_Logic.countPossibleWumpus();
             //If the wumpus is no longer alive, remove all the facts regarding it 
             //from the KB:
-            if(!w.wumpusAlive())
-            {
-                m_Logic.solve("removeAll(wumpus).");
-                m_Logic.solve("removeAll(p_wumpus).");
-            }
+            
             //Converts cX,cY into a position
             Pos start = new Pos(cX,cY);
             
@@ -376,6 +366,11 @@ public class MyAgent implements Agent
                     if(what.compareTo("wumpus") == 0)
                     {
                         w.doAction(World.A_SHOOT);
+                        if(!w.wumpusAlive())
+                        {
+                            m_Logic.solve("removeAll(wumpus).");
+                            m_Logic.solve("removeAll(p_wumpus).");
+                        }
                         return;
                     }
                 }
